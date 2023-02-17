@@ -19,6 +19,18 @@ body {
 h4 {
   color: #f0a500;
 }
+.phone_number{
+    width: calc( 100% - 252px );
+    display: inline-block;
+    float: right;
+}
+.select2-container--default .select2-selection--single {
+    height: 30px !important;
+}
+ul#form_warnings li {
+    color: red;
+    list-style: auto;
+}
 input,
 input[type="radio"] + label,
 input[type="checkbox"] + label:before,
@@ -69,9 +81,7 @@ input[type="radio"] + label i {
   padding-right: 0.4em;
 }
 input[type="radio"]:checked + label,
-input:checked + label:before,
-select:focus,
-select:active {
+input:checked + label:before{
   background-color: #f0a500;
   color: #fff;
   border-color: #bd8200;
@@ -123,10 +133,7 @@ select:focus,
 select:active {
   outline: 0;
 }
-select option {
-  background-color: #f0a500;
-  color: #fff;
-}
+
 .btn{
     display: inline-block;
     padding: 1em 2em;
