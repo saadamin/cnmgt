@@ -40,7 +40,8 @@ class Cnmgt_Activator {
 				  email varchar(255) DEFAULT '' NOT NULL,
 				  phone_numbers json DEFAULT '' NULL,
 				  deleted tinyint DEFAULT 0,
-				  UNIQUE KEY id (id)
+				  PRIMARY KEY  id (id),
+    			  UNIQUE KEY email (email)
 				) $charset_collate;";
 		
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
