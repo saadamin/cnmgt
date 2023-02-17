@@ -47,11 +47,12 @@ class Cnmgt_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
+
+
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -74,6 +75,7 @@ class Cnmgt_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/cnmgt-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', array(), $this->version, 'all' );
 
 	}
 
@@ -99,5 +101,29 @@ class Cnmgt_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/cnmgt-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
+	public function load_menu()
+	{
+		// Menu hook
+		global $cnmgt_hook;
+    	// Add main page
+		$cnmgt_hook = add_menu_page( 'Contact Management', 'Contact Management', 'manage_options', 'cnmgt',array( __CLASS__, 'show_all_people' ), 'dashicons-universal-access', 6 );
+		$cnmgt_hook = add_submenu_page('cnmgt', 'All_Entries', 'Add People', 'manage_options', 'cnmgt_manage_users',  array( __CLASS__, 'manage_people' ));
+	}
+	public static function show_all_people() {
+		return plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/cnmgt-admin-display.php';
+	}
+	public static function manage_people() {
+		$countries = self::get_countries();
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/cnmgt-manage-people.php';
+	}
+	private static function get_countries() {
+		// Getting country list from restcountries.com
+		$raw_response = wp_remote_get( 'https://restcountries.com/v2/all' );
 
+		if ( !is_wp_error( $raw_response ) && ( wp_remote_retrieve_response_code( $raw_response ) == 200 ) ) {
+			
+			$response = wp_remote_retrieve_response_code( $raw_response );
+		}
+		return wp_remote_retrieve_body( $raw_response);
+	}
 }
