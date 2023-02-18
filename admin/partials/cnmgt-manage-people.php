@@ -41,6 +41,7 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
                     ),
                     array('id' => $_POST['cnmgt_id'])
                 );
+                $button_class='new';
                 $cnmgt_name = $cnmgt_email=$phone_number=$country_code='';$url=substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'&action=edit'));
                 $warning = "<li class='alert alert-success'>Success! ".$_POST['cnmgt_name'].' has been updated in the database.</li>';
             }
@@ -106,32 +107,32 @@ function get_phone_number_only($full_number){
                 $country_code = get_country_code_only($phoneNumber);
                 $phone_number = get_phone_number_only($phoneNumber);    
             ?>
-                <div id="country_div<?php echo $index; ?>" class="clonedInput" align="center">
+                <div id="country_div<?php echo $index+1; ?>" class="clonedInput" align="center">
                     <select class="countries" name="cnmgt_country_code[]">
                     <option value=''>Select a country</option>"
                         <?php foreach(json_decode($countries) as $country){ 
                             $callingCodes=$country->callingCodes[0];
                             $selected = $country_code == $callingCodes ? 'selected' : '';
-                            echo "<option value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
+                            echo "<option class='country_code_$callingCodes' value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
                         }
                         ?>
                     </select>
-                    <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" minlength="9" maxlength="9" type = "number" max="999999999" value="<?php echo $phone_number; ?>" />
-                    <button class="delete_number" id="btnDel<?php echo $index; ?>" del="<?php echo $index; ?>" type="button">Delete</button>
+                    <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" value="<?php echo $phone_number; ?>" />
+                    <button class="delete_number" id="btnDel<?php echo $index+1; ?>" del="<?php echo $index+1; ?>" type="button">Delete</button>
                 </div>
             <?php }
         }else{ ?>
         <div id="country_div1" class="clonedInput" align="center">
             <select class="countries" name="cnmgt_country_code[]">
-            <option value=''>Select a country</option>"
+                <option value=''>Select a country</option>
                 <?php foreach(json_decode($countries) as $country){ 
                     $callingCodes=$country->callingCodes[0];
                     $selected = $country_code == $callingCodes ? 'selected' : '';
-                    echo "<option value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
+                    echo "<option class='country_code_$callingCodes' value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
                 }
                 ?>
             </select>
-            <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" minlength="9" maxlength="9" type = "number" max="999999999" value="<?php echo $phone_number; ?>" />
+            <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" value="<?php echo $phone_number; ?>" />
         </div>
         <?php } ?>
       </div>
@@ -145,7 +146,7 @@ function get_phone_number_only($full_number){
 
 <script>
 jQuery(document).ready(function() {
-    jQuery('.countries').select2();
+    syncSelects();
 	
     jQuery('#btnAdd').click(function () {
         var num = jQuery('.clonedInput').length;
@@ -175,8 +176,7 @@ jQuery(document).ready(function() {
         jQuery(select).parent().attr('id', newId);
         console.log("e");
         jQuery('#country_div' + num).after(clone);
-        jQuery('#btnDel').attr('disabled', false);
-        jQuery('.countries').select2();
+        syncSelects();
     });
 
     jQuery('.delete_number').click(function () {
@@ -189,7 +189,27 @@ jQuery(document).ready(function() {
             jQuery('#country_div' + id).remove();
         }
     });
-       
-  
+    b=0;
+    jQuery(document.body).on("change",".countries",function(){
+        syncSelects();
+    });
+    function syncSelects() {
+        let selected = [];
+        jQuery('select.countries').each(function() {
+            if(this.value.length > 0){selected.push(this.value);}
+            this.childNodes.forEach(function(el){
+                jQuery(el).removeProp('disabled'); jQuery(el).removeAttr('disabled');
+            });
+        });
+        console.log(selected)
+        selected.forEach(element => {
+            jQuery(".country_code_"+element).prop('disabled', !jQuery(".country_code_"+element).prop('disabled'));
+        });
+        jQuery('select').select2();
+    }
+    jQuery(document).on('keyup',".phone_number", function() {
+        if(this.value.length > 9){ this.value = this.value.slice(0, this.maxLength);}
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
 });
 </script>
