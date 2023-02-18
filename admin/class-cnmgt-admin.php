@@ -77,6 +77,7 @@ class Cnmgt_Admin {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/cnmgt-admin.css', array(), $this->version, 'all' );
 		wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', array(), $this->version, 'all' );
 		wp_enqueue_style( 'select2_css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'datatable_css', 'https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css', array(), $this->version, 'all' );
 
 	}
 
@@ -101,6 +102,7 @@ class Cnmgt_Admin {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/cnmgt-admin.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script( 'select2_js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'datatable_js', 'https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js', array( 'jquery' ), $this->version, false );
 
 	}
 	public function load_menu()
@@ -108,11 +110,11 @@ class Cnmgt_Admin {
 		// Menu hook
 		global $cnmgt_hook;
     	// Add main page
-		$cnmgt_hook = add_menu_page( 'Contact Management', 'Contact Management', 'manage_options', 'cnmgt',array( __CLASS__, 'show_all_people' ), 'dashicons-universal-access', 6 );
-		$cnmgt_hook = add_submenu_page('cnmgt', 'All_Entries', 'Add People', 'manage_options', 'cnmgt_manage_users',  array( __CLASS__, 'manage_people' ));
+		$cnmgt_hook = add_menu_page( 'All contacts', 'Contact Management', 'manage_options', 'cnmgt',array( __CLASS__, 'show_all_people' ), 'dashicons-universal-access', 6 );
+		$cnmgt_hook = add_submenu_page('cnmgt', 'Add People', 'Add People', 'manage_options', 'cnmgt_manage_users',  array( __CLASS__, 'manage_people' ));
 	}
 	public static function show_all_people() {
-		return plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/cnmgt-admin-display.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/cnmgt-show-all-people.php';
 	}
 	public static function manage_people() {
 		$countries = self::get_countries();
@@ -127,5 +129,22 @@ class Cnmgt_Admin {
 			$response = wp_remote_retrieve_response_code( $raw_response );
 		}
 		return wp_remote_retrieve_body( $raw_response);
+	}
+	public static function cnmgt_get_people(){
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'cnmgt';
+		$people = $wpdb->get_results( "SELECT * FROM $table_name where deleted = 0" );
+		return $people;
+	}
+	public static function cnmgt_delete_person($id)
+	{
+		global $wpdb;
+		return $wpdb->update(
+			$wpdb->prefix.'cnmgt',
+			array(
+				'deleted' => 1,
+			),
+			array('id' => intval($id))
+		);
 	}
 }

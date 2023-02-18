@@ -3,39 +3,39 @@
  * included in this file.
  */
 
- /* 64ac15 */
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-}
-body {
-  padding: 1em;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 15px;
-  color: #b9b9b9;
-  background-color: #e3e3e3;
-}
-h4 {
-  color: #f0a500;
-}
-.phone_number{
+
+/* Path: admin\css\cnmgt-admin.css */
+#cnmgt_main .phone_number{
     width: calc( 100% - 252px );
     display: inline-block;
     float: right;
 }
-.select2-container--default .select2-selection--single {
-    height: 30px !important;
+#cnmgt_main .select2-container{
+    width: 240px !important;
 }
-ul#form_warnings li {
+#cnmgt_main .select2-container--default .select2-selection--single {
+    height: 49.59px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 45px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 12px !important;
+    right: 11px !important;
+}
+#cnmgt_main ul#form_warnings li {
     color: red;
     list-style: auto;
 }
-input,
-input[type="radio"] + label,
-input[type="checkbox"] + label:before,
-select option,
-select {
+#cnmgt_main ul#form_success li {
+    color: green;
+    list-style: none;
+}
+#cnmgt_main input,
+#cnmgt_main input[type="radio"] + label,
+#cnmgt_main input[type="checkbox"] + label:before,
+#cnmgt_main select option,
+#cnmgt_main select {
   width: 100%;
   padding: 1em;
   line-height: 1.4;
@@ -48,53 +48,53 @@ select {
   transition: 0.35s ease-in-out;
   transition: all 0.35s ease-in-out;
 }
-input:focus {
+#cnmgt_main input:focus {
   outline: 0;
   border-color: #bd8200;
 }
-input:focus + .input-icon i {
+#cnmgt_main input:focus + .input-icon i {
   color: #f0a500;
 }
-input:focus + .input-icon:after {
+#cnmgt_main input:focus + .input-icon:after {
   border-right-color: #f0a500;
 }
-input[type="radio"] {
+#cnmgt_main input[type="radio"] {
   display: none;
 }
-input[type="radio"] + label,
-select {
+#cnmgt_main input[type="radio"] + label,
+#cnmgt_main select {
   display: inline-block;
   width: 50%;
   text-align: center;
   float: left;
   border-radius: 0;
 }
-input[type="radio"] + label:first-of-type {
+#cnmgt_main input[type="radio"] + label:first-of-type {
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-input[type="radio"] + label:last-of-type {
+#cnmgt_main input[type="radio"] + label:last-of-type {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-input[type="radio"] + label i {
+#cnmgt_main input[type="radio"] + label i {
   padding-right: 0.4em;
 }
-input[type="radio"]:checked + label,
-input:checked + label:before{
+#cnmgt_main input[type="radio"]:checked + label,
+#cnmgt_main input:checked + label:before{
   background-color: #f0a500;
   color: #fff;
   border-color: #bd8200;
 }
-input[type="checkbox"] {
+#cnmgt_main input[type="checkbox"] {
   display: none;
 }
-input[type="checkbox"] + label {
+#cnmgt_main input[type="checkbox"] + label {
   position: relative;
   display: block;
   padding-left: 1.6em;
 }
-input[type="checkbox"] + label:before {
+#cnmgt_main input[type="checkbox"] + label:before {
   position: absolute;
   top: 0.2em;
   left: 0;
@@ -104,7 +104,7 @@ input[type="checkbox"] + label:before {
   padding: 0;
   content: "";
 }
-input[type="checkbox"] + label:after {
+#cnmgt_main input[type="checkbox"] + label:after {
   position: absolute;
   top: 0.45em;
   left: 0.2em;
@@ -114,27 +114,9 @@ input[type="checkbox"] + label:after {
   font-family: FontAwesome;
   content: "\f00c";
 }
-input:checked + label:after {
-  opacity: 1;
-}
-select {
-  height: 3.4em;
-  line-height: 2;
-}
-select:first-of-type {
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-select:last-of-type {
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-select:focus,
-select:active {
-  outline: 0;
-}
 
-.btn{
+
+#cnmgt_main .btn{
     display: inline-block;
     padding: 1em 2em;
     background-color: #f0a500;
@@ -149,27 +131,27 @@ select:active {
     transition: all 0.35s ease-in-out;
     float:right;
 }
-.input-group {
+#cnmgt_main .input-group {
   margin-bottom: 1em;
   zoom: 1;
 }
-.input-group:before,
-.input-group:after {
+#cnmgt_main .input-group:before,
+#cnmgt_main .input-group:after {
   content: "";
   display: table;
 }
-.input-group:after {
+#cnmgt_main .input-group:after {
   clear: both;
 }
-.input-group-icon {
+#cnmgt_main .input-group-icon {
   position: relative;
 }
-.input-group-icon input {
+#cnmgt_main .input-group-icon input:not(.phone_number){
   padding-left: 4.4em;
 }
-.input-group-icon .input-icon {
+#cnmgt_main .input-group-icon .input-icon {
   position: absolute;
-  top: -11px;
+  top: 0;
   left: 0;
   width: 3.4em;
   height: 3.4em;
@@ -177,7 +159,7 @@ select:active {
   text-align: center;
   pointer-events: none;
 }
-.input-group-icon .input-icon:after {
+#cnmgt_main .input-group-icon .input-icon:after {
   position: absolute;
   top: 0.6em;
   bottom: 0.6em;
@@ -191,14 +173,14 @@ select:active {
   transition: 0.35s ease-in-out;
   transition: all 0.35s ease-in-out;
 }
-.input-group-icon .input-icon i {
+#cnmgt_main .input-group-icon .input-icon i {
   -webkit-transition: 0.35s ease-in-out;
   -moz-transition: 0.35s ease-in-out;
   -o-transition: 0.35s ease-in-out;
   transition: 0.35s ease-in-out;
   transition: all 0.35s ease-in-out;
 }
-.container {
+#cnmgt_main .container {
   max-width: 38em;
   padding: 1em 3em 2em 3em;
   margin: 0em auto;
@@ -206,36 +188,103 @@ select:active {
   border-radius: 4.2px;
   box-shadow: 0px 3px 10px -2px rgba(0, 0, 0, 0.2);
 }
-.row {
+#cnmgt_main .row {
   zoom: 1;
 }
-.row:before,
-.row:after {
+div#cnmgt_main_all {
+    max-width: 80vw;
+    margin: 0 auto;
+    background-color: #fff;
+}
+#cnmgt_main .row:before,
+#cnmgt_main .row:after {
   content: "";
   display: table;
 }
-.row:after {
+#cnmgt_main .row:after {
   clear: both;
 }
-.col-half {
+#cnmgt_main .col-half {
   padding-right: 10px;
   float: left;
   width: 50%;
 }
-.col-half:last-of-type {
+#cnmgt_main .col-half:last-of-type {
   padding-right: 0;
 }
-.col-third {
+#cnmgt_main .col-third {
   padding-right: 10px;
   float: left;
   width: 33.33333333%;
 }
-.col-third:last-of-type {
+#cnmgt_main .col-third:last-of-type {
   padding-right: 0;
 }
-@media only screen and (max-width: 540px) {
-  .col-half {
+#cnmgt_main tfoot input {
     width: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+}
+div#cnmgt_main_all .dataTables_wrapper .dataTables_length select{
+    -webkit-appearance: auto;
+    background: none;
+}
+div#people_wrapper {
+    padding: 50px;
+}
+div#cnmgt_main_all h1 {
+    padding-top: 50px;
+    text-align: center;
+}
+div#cnmgt_main_all div#people_filter  {
+    margin-bottom: 30px;
+}
+div#cnmgt_main_all div#people_info, div#cnmgt_main_all div#people_paginate {
+    margin-top: 30px;
+}
+div#cnmgt_main_all div#people_wrapper a, div#cnmgt_main_all div#people_wrapper .btn.delete_button {
+    background-color: #f0a500;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    border-width: inherit;
+    cursor: pointer;
+}
+div#cnmgt_main_all div#people_wrapper a:hover, div#cnmgt_main_all div#people_wrapper .btn.delete_button:hover, div.cnmgt .btn:hover {
+    background-color: #d63638 !important;
+}
+div#cnmgt_main_all table#people {
+    border: 1px solid #dcdcde;
+}
+div.cnmgt .alert {
+    text-align: center;
+    padding: 30px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 50px;
+    border: 1px solid #dcdcde;
+    overflow: hidden;
+    background-color: #f6f7f7;
+}
+div.cnmgt .alert-success{
+        color: #0f5132;
+}
+div.cnmgt .alert-danger{
+        color: #842029;
+}
+div.cnmgt .alert-warning{
+        color: #664d03;
+}
+div#cnmgt_main_all form.delete_person {
+    display: inline;
+}
+    div.cnmgt .container {
+        margin-top: 100px !important;
+    }
+
+@media only screen and (max-width: 540px) {
+    #cnmgt_main .col-half, #cnmgt_main .select2-container , #cnmgt_main .phone_number {
+    width: 100% !important;
     padding-right: 0;
   }
 }
