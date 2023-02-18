@@ -1,5 +1,5 @@
 <?php
-// echo '<pre>';print_r($_SERVER);echo '</pre>';
+echo '<pre>';print_r($_POST);echo '</pre>';
 $cnmgt_name = $cnmgt_email=$phone_number=$country_code=$warning=$url='';
 $button_class='new';
 if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
@@ -16,9 +16,9 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
             global $wpdb;
             if($_POST['cnmgt_submitButton'] == 'new'){
                 $existingEmail = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cnmgt WHERE email = %s" , trim($_POST['cnmgt_email'])));
-                $existingPhone = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cnmgt WHERE phone_numbers IN (%s)" , array(escape_array($phoneNumbers))));
+                $existingPhone = check_existing_phone($phoneNumbers);
                 if($existingEmail || $existingPhone){
-                    $warning .= $existingEmail ? '<li>Person with this email already exists.</li>' : '<li>Person with this phone number already exists.</li>';
+                    $warning .= $existingEmail ? '<li>Person with this email already exists.</li>' : "<li>Person with phone number $existingPhone already exists.</li>";
                 }else{
                     $people =$wpdb->insert( 
                         $wpdb->prefix.'cnmgt',
@@ -32,18 +32,26 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
                     $warning = "Success! ".$_POST['cnmgt_name'].' has been added to the database.';
                 }
             }elseif($_POST['cnmgt_submitButton'] == 'edit'){
-                $wpdb->update(
-                    $wpdb->prefix.'cnmgt',
-                    array(
-                        'name' => trim($_POST['cnmgt_name']),
-                        'email' => trim($_POST['cnmgt_email']),
-                        'phone_numbers' => escape_array($phoneNumbers),
-                    ),
-                    array('id' => $_POST['cnmgt_id'])
-                );
-                $button_class='new';
-                $cnmgt_name = $cnmgt_email=$phone_number=$country_code='';$url=substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'&action=edit'));
-                $warning = "<li class='alert alert-success'>Success! ".$_POST['cnmgt_name'].' has been updated in the database.</li>';
+                $phoneNumbers=check_all_phone_numbers($_POST,$warning);
+                $existingEmail = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cnmgt WHERE email = %s AND id != %d" , array(trim($_POST['cnmgt_email']),$_POST['cnmgt_id'])));
+                $existingPhone = check_existing_phone($phoneNumbers,$_POST['cnmgt_id']);
+                $B=$wpdb->last_query;
+                if($existingEmail || $existingPhone){
+                    $warning .= $existingEmail ? '<li>Person with this email already exists.</li>' : "<li>Person with phone number $existingPhone already exists.</li>";
+                }else{
+                    $wpdb->update(
+                        $wpdb->prefix.'cnmgt',
+                        array(
+                            'name' => trim($_POST['cnmgt_name']),
+                            'email' => trim($_POST['cnmgt_email']),
+                            'phone_numbers' => escape_array($phoneNumbers),
+                        ),
+                        array('id' => $_POST['cnmgt_id'])
+                    );
+                    $button_class='new';
+                    $cnmgt_name = $cnmgt_email=$phone_number=$country_code='';$url=substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'&action=edit'));
+                    $warning = "<li class='alert alert-success'>Success! ".$_POST['cnmgt_name'].' has been updated in the database.</li>';
+                }
             }
         }
         $warning.='</ul>';
@@ -59,6 +67,21 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
             $button_class = 'edit';
         }
     }
+}
+function check_existing_phone($numbers,$id=0){
+    global $wpdb;
+    foreach($numbers as $number){
+        if($id){
+            $result= $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cnmgt WHERE phone_numbers Like (%s) AND id != %d" , array("%$number%",$_POST['cnmgt_id'])));
+        }else{
+            $result=$wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}cnmgt WHERE phone_numbers Like (%s)" , array("%$number%")));
+        }
+        $r=$wpdb->last_query;
+        if($result){
+            return $number;
+        }
+    }
+    return false;
 }
 function check_all_phone_numbers($post,$warning){
     foreach($post['cnmgt_phone_number'] as $key => $value){
@@ -108,8 +131,8 @@ function get_phone_number_only($full_number){
                 $phone_number = get_phone_number_only($phoneNumber);    
             ?>
                 <div id="country_div<?php echo $index+1; ?>" class="clonedInput" align="center">
-                    <select class="countries" name="cnmgt_country_code[]">
-                    <option value=''>Select a country</option>"
+                    <select class="countries">
+                        <option value=''>Select a country</option>
                         <?php foreach(json_decode($countries) as $country){ 
                             $callingCodes=$country->callingCodes[0];
                             $selected = $country_code == $callingCodes ? 'selected' : '';
@@ -122,18 +145,17 @@ function get_phone_number_only($full_number){
                 </div>
             <?php }
         }else{ ?>
-        <div id="country_div1" class="clonedInput" align="center">
-            <select class="countries" name="cnmgt_country_code[]">
-                <option value=''>Select a country</option>
-                <?php foreach(json_decode($countries) as $country){ 
-                    $callingCodes=$country->callingCodes[0];
-                    $selected = $country_code == $callingCodes ? 'selected' : '';
-                    echo "<option class='country_code_$callingCodes' value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
-                }
-                ?>
-            </select>
-            <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" value="<?php echo $phone_number; ?>" />
-        </div>
+            <div id="country_div1" class="clonedInput" align="center">
+                <select class="countries">
+                    <option value=''>Select a country</option>
+                    <?php foreach(json_decode($countries) as $country){ 
+                        $callingCodes=$country->callingCodes[0];
+                        echo "<option class='country_code_$callingCodes' value='$callingCodes'>$country->name ($callingCodes)</option>";
+                    }
+                    ?>
+                </select>
+                <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" value="<?php echo $phone_number; ?>" />
+            </div>
         <?php } ?>
       </div>
         <button id="btnAdd" type="button">Add More</button>
@@ -163,11 +185,6 @@ jQuery(document).ready(function() {
         console.log("c");
         clone.find('span.select2-container').remove();
         clone.find('input.phone_number').val("");
-        // Find the selected value in the clone, and remove
-        // if(theValue !="PleaseSelectOne") {
-        //     clone.find('option[value=' + theValue + ']').remove();
-        // }
-        console.log("d");
         // Grab the select in the clone
         select = clone.find('select');select.val("");
         var newId="country_div"+newNum;
@@ -191,24 +208,31 @@ jQuery(document).ready(function() {
     });
     b=0;
     jQuery(document.body).on("change",".countries",function(){
-        syncSelects();
+        syncSelects(jQuery(this).select2("data")[0].id);
     });
-    function syncSelects() {
+    
+    function syncSelects(val = null) {
         let selected = [];
+        jQuery('.cnmgt_country_code').remove();
         jQuery('select.countries').each(function() {
-            if(this.value.length > 0){selected.push(this.value);}
+            // let value = val !== null ? val : this.value;
+            let value = this.value;
+            if(value.length > 0){
+                selected.push(value);
+            }
+            document.querySelector("form").insertAdjacentHTML("afterbegin", '<input class="cnmgt_country_code" type="hidden" name="cnmgt_country_code[]" value="'+value+'" />');
             this.childNodes.forEach(function(el){
                 jQuery(el).removeProp('disabled'); jQuery(el).removeAttr('disabled');
             });
+            
         });
-        console.log(selected)
         selected.forEach(element => {
             jQuery(".country_code_"+element).prop('disabled', !jQuery(".country_code_"+element).prop('disabled'));
         });
         jQuery('select').select2();
     }
     jQuery(document).on('keyup',".phone_number", function() {
-        if(this.value.length > 9){ this.value = this.value.slice(0, this.maxLength);}
+        if(this.value.length > 9){ this.value = this.value.slice(0, 9);}
         this.value = this.value.replace(/[^0-9]/g, '');
     });
 });
