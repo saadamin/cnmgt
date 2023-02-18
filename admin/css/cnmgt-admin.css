@@ -11,7 +11,7 @@
     float: right;
 }
 #cnmgt_main .select2-container{
-    width: 240px !important;
+    width: 50% !important;
 }
 #cnmgt_main .select2-container--default .select2-selection--single {
     height: 49.59px !important;
@@ -278,10 +278,12 @@ div.cnmgt .alert-warning{
 div#cnmgt_main_all form.delete_person {
     display: inline;
 }
-    div.cnmgt .container {
-        margin-top: 100px !important;
-    }
-
+  div.cnmgt .container {
+      margin-top: 100px !important;
+  }
+  .clonedInput {
+    display: flex;
+}
 @media only screen and (max-width: 540px) {
     #cnmgt_main .col-half, #cnmgt_main .select2-container , #cnmgt_main .phone_number {
     width: 100% !important;

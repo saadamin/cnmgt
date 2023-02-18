@@ -6,6 +6,7 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
     if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'add_edit_person' ) ) {
         wp_die( 'Are you cheating?' );
     } else {
+        $button_class=$_POST['cnmgt_submitButton'];
         $warning= '<ul id="form_warnings">';
         if(strlen(trim($_POST['cnmgt_name'])) < 5) {$warning .= '<li>Name must be at least 3 characters long.</li>';}else{$cnmgt_name = $_POST['cnmgt_name'];}
         if(!filter_var(trim($_POST['cnmgt_email']), FILTER_VALIDATE_EMAIL) ) {$warning .= '<li>Please write valid email.</li>';}else{$cnmgt_email = $_POST['cnmgt_email'];}
@@ -53,9 +54,7 @@ if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
         if($people){
             $cnmgt_name = $people[0]->name;
             $cnmgt_email = $people[0]->email;
-            $phoneNumbers = explode(',',$people[0]->phone_numbers);
-            $country_code = get_country_code_only($phoneNumbers[0]);
-            $phone_number = get_phone_number_only($phoneNumbers[0]);
+            $phoneNumbers = explode(',',str_replace(array( '[', ']' ), '', $people[0]->phone_numbers));
             $button_class = 'edit';
         }
     }
@@ -72,7 +71,7 @@ function check_all_phone_numbers($post,$warning){
     return $phoneNumbers;
 }
 function escape_array($arr){
-    return implode(',', $arr);
+    return '['.implode(',', $arr).']';
 }
 function get_country_code_only($full_number)
 {
@@ -92,27 +91,52 @@ function get_phone_number_only($full_number){
     ?>
     <div class="row">
         <?php if('<ul id="form_warnings"></ul>' !== $warning){ echo $warning; } ?>
-      <h4>Account</h4>
+      <h4><?php echo $button_class=='edit' ? 'Edit a person' : 'Add a person'; ?></h4>
       <div class="input-group input-group-icon">
-        <input type="text" name="cnmgt_name" placeholder="Full Name" value="<?php echo $cnmgt_name; ?>"/>
+        <input type="text" name="cnmgt_name" placeholder="Full Name" required value="<?php echo $cnmgt_name; ?>"/>
         <div class="input-icon"><i class="fa fa-user"></i></div>
       </div>
       <div class="input-group input-group-icon">
-        <input type="email" name="cnmgt_email" placeholder="Email Address" value="<?php echo $cnmgt_email; ?>"/>
+        <input type="email" name="cnmgt_email" placeholder="Email Address" required value="<?php echo $cnmgt_email; ?>"/>
         <div class="input-icon"><i class="fa fa-envelope"></i></div>
       </div>
       <div class="input-group input-group-icon">
-      <select class="countries" name="cnmgt_country_code[]">
-      <option value=''>Select a country</option>"
-        <?php foreach(json_decode($countries) as $country){ 
-            $callingCodes=$country->callingCodes[0];
-            $selected = $country_code == $callingCodes ? 'selected' : '';
-            echo "<option value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
-        }
-        ?>
-        </select>
-        <input type="number" class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" value="<?php echo $phone_number; ?>" />
+        <?php if($button_class=='edit'){
+            foreach($phoneNumbers as $index => $phoneNumber){
+                $country_code = get_country_code_only($phoneNumber);
+                $phone_number = get_phone_number_only($phoneNumber);    
+            ?>
+                <div id="country_div<?php echo $index; ?>" class="clonedInput" align="center">
+                    <select class="countries" name="cnmgt_country_code[]">
+                    <option value=''>Select a country</option>"
+                        <?php foreach(json_decode($countries) as $country){ 
+                            $callingCodes=$country->callingCodes[0];
+                            $selected = $country_code == $callingCodes ? 'selected' : '';
+                            echo "<option value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
+                        }
+                        ?>
+                    </select>
+                    <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" minlength="9" maxlength="9" type = "number" max="999999999" value="<?php echo $phone_number; ?>" />
+                    <button class="delete_number" id="btnDel<?php echo $index; ?>" del="<?php echo $index; ?>" type="button">Delete</button>
+                </div>
+            <?php }
+        }else{ ?>
+        <div id="country_div1" class="clonedInput" align="center">
+            <select class="countries" name="cnmgt_country_code[]">
+            <option value=''>Select a country</option>"
+                <?php foreach(json_decode($countries) as $country){ 
+                    $callingCodes=$country->callingCodes[0];
+                    $selected = $country_code == $callingCodes ? 'selected' : '';
+                    echo "<option value='$callingCodes' $selected>$country->name ($callingCodes)</option>";
+                }
+                ?>
+            </select>
+            <input type="number" required class="phone_number" name="cnmgt_phone_number[]" placeholder="Write phone number" minlength="9" maxlength="9" type = "number" max="999999999" value="<?php echo $phone_number; ?>" />
+        </div>
+        <?php } ?>
       </div>
+        <button id="btnAdd" type="button">Add More</button>
+        
       <button class="btn" name="cnmgt_submitButton" value="<?php echo $button_class; ?>" type="submit">Save</button>
     </div>
   </form>
@@ -122,5 +146,50 @@ function get_phone_number_only($full_number){
 <script>
 jQuery(document).ready(function() {
     jQuery('.countries').select2();
+	
+    jQuery('#btnAdd').click(function () {
+        var num = jQuery('.clonedInput').length;
+        newNum = new Number(num + 1);
+        newElem = jQuery('#country_div' + num).clone().attr('id', 'country_div' + newNum).fadeIn('normal'); 
+        // Store the block in a variable
+        var jQueryblock = jQuery('.clonedInput:last');
+        console.log("a");
+        // Grab the selected value
+        var theValue = jQueryblock.find(':selected').val();
+        console.log("b");
+        // Clone the block 
+        var clone = jQueryblock.clone();
+        console.log("c");
+        clone.find('span.select2-container').remove();
+        clone.find('input.phone_number').val("");
+        // Find the selected value in the clone, and remove
+        // if(theValue !="PleaseSelectOne") {
+        //     clone.find('option[value=' + theValue + ']').remove();
+        // }
+        console.log("d");
+        // Grab the select in the clone
+        select = clone.find('select');select.val("");
+        var newId="country_div"+newNum;
+        console.log(newId);
+        // Update its ID by concatenating theValue to the current ID
+        jQuery(select).parent().attr('id', newId);
+        console.log("e");
+        jQuery('#country_div' + num).after(clone);
+        jQuery('#btnDel').attr('disabled', false);
+        jQuery('.countries').select2();
+    });
+
+    jQuery('.delete_number').click(function () {
+        if( jQuery('.clonedInput').length == 1 ) {
+            alert("You can't delete the last one!");
+            jQuery(this).attr('disabled', true);
+            return false;
+        }else{
+            var id = jQuery(this).attr('del');
+            jQuery('#country_div' + id).remove();
+        }
+    });
+       
+  
 });
 </script>
