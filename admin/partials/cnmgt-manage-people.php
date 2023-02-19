@@ -171,9 +171,9 @@ jQuery(document).ready(function() {
     syncSelects();
 	
     jQuery('#btnAdd').click(function () {
-        var num = jQuery('.clonedInput').length;
-        newNum = new Number(num + 1);
-        newElem = jQuery('#country_div' + num).clone().attr('id', 'country_div' + newNum).fadeIn('normal'); 
+        var elements = document. getElementsByClassName('clonedInput');
+        newNum = Math.floor(Math.random() * (50000000000000 - 0 + 1)) + 0;
+        newElem = jQuery(elements[0]).clone().attr('id', 'country_div' + newNum).fadeIn('normal'); 
         // Store the block in a variable
         var jQueryblock = jQuery('.clonedInput:last');
         // Grab the selected value
@@ -182,6 +182,8 @@ jQuery(document).ready(function() {
         var clone = jQueryblock.clone();
         clone.find('span.select2-container').remove();
         clone.find('input.phone_number').val("");
+        clone.find('button.delete_number').attr('id', "btnDel" + newNum);
+        clone.find('button.delete_number').attr('del', newNum);
         clone.find('button.delete_number').attr('disabled', false);
         // Grab the select in the clone
         select = clone.find('select');select.val("");
@@ -189,11 +191,11 @@ jQuery(document).ready(function() {
         console.log(newId);
         // Update its ID by concatenating theValue to the current ID
         jQuery(select).parent().attr('id', newId);
-        jQuery('#country_div' + num).after(clone);
+        jQuery(elements[elements.length-1]).after(clone);
         syncSelects();
     });
 
-    jQuery('.delete_number').click(function () {
+    jQuery(document.body).on("click",".delete_number",function(){
         if( jQuery('.clonedInput').length == 1 ) {
             alert("You can't delete the last one!");
             jQuery(this).attr('disabled', true);
@@ -201,6 +203,7 @@ jQuery(document).ready(function() {
         }else{
             var id = jQuery(this).attr('del');
             jQuery('#country_div' + id).remove();
+            syncSelects();
         }
     });
     b=0;
