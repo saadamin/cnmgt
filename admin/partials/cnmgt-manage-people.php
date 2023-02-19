@@ -176,22 +176,19 @@ jQuery(document).ready(function() {
         newElem = jQuery('#country_div' + num).clone().attr('id', 'country_div' + newNum).fadeIn('normal'); 
         // Store the block in a variable
         var jQueryblock = jQuery('.clonedInput:last');
-        console.log("a");
         // Grab the selected value
         var theValue = jQueryblock.find(':selected').val();
-        console.log("b");
         // Clone the block 
         var clone = jQueryblock.clone();
-        console.log("c");
         clone.find('span.select2-container').remove();
         clone.find('input.phone_number').val("");
+        clone.find('button.delete_number').attr('disabled', false);
         // Grab the select in the clone
         select = clone.find('select');select.val("");
         var newId="country_div"+newNum;
         console.log(newId);
         // Update its ID by concatenating theValue to the current ID
         jQuery(select).parent().attr('id', newId);
-        console.log("e");
         jQuery('#country_div' + num).after(clone);
         syncSelects();
     });
