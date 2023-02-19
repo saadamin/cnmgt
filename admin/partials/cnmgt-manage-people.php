@@ -1,5 +1,5 @@
 <?php
-echo '<pre>';print_r($_POST);echo '</pre>';
+// echo '<pre>';print_r($_POST);echo '</pre>';
 $cnmgt_name = $cnmgt_email=$phone_number=$country_code=$warning=$url='';
 $button_class='new';
 if(isset($_POST['cnmgt_submitButton'])){ //check if form was submitted
