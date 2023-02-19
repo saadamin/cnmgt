@@ -28,5 +28,37 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
-
+    jQuery(function() {
+		jQuery(".delete_button").click(function(){
+			if (confirm("Are you sure you want to delete?")){
+				jQuery('form#delete_person'+jQuery(this).attr('person_id')).submit();
+			}
+		});
+		});
+		jQuery(document).ready(function () {
+		// Setup - add a text input to each footer cell
+		jQuery('#people tfoot th').each(function () {
+			var title = jQuery(this).text();
+			if(title != 'Action'){
+				jQuery(this).html('<input type="text" placeholder="Search ' + title + '" />');
+			}
+		});
+	 
+		// DataTable
+		var table = jQuery('#people').DataTable({
+			initComplete: function () {
+				// Apply the search
+				this.api()
+					.columns()
+					.every(function () {
+						var that = this;
+						jQuery('input', this.footer()).on('keyup change clear', function () {
+							if (that.search() !== this.value) {
+								that.search(this.value).draw();
+							}
+						});
+					});
+			},
+		});
+	});
 })( jQuery );

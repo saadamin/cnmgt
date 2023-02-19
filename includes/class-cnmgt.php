@@ -122,6 +122,12 @@ class Cnmgt {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-cnmgt-public.php';
 
+		/**
+		 * The class responsible for defining all actions that occur in the public-facing
+		 * side of the site by short code.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-cnmgt-short-code.php';
+
 		$this->loader = new Cnmgt_Loader();
 
 	}
